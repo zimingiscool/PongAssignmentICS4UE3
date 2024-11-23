@@ -1,104 +1,128 @@
-import java.awt.*; // For JFrame, JPanel, and Timer
-import java.awt.event.*; // For Graphics, Color, and Dimension
+import java.awt.*; // For Graphics, Color, and Dimension
+import java.awt.event.*; // For ActionListener, KeyListener
 import javax.swing.*;
 
 public class App extends JPanel implements ActionListener, KeyListener {
-  private static final int screenWidth = 600;
-  private static final int screenHeight = 400;
+    private static final int paddlePadding = 30; // Distance from edge for paddles
 
-  private static final int paddlePadding = 30;
+    private Ball ball; // The ball object
+    private Paddle paddle; // Player 1 paddle
+    private Paddle paddle2; // Player 2 paddle
 
-  private Ball ball;
-  private Paddle paddle;
-  private Paddle paddle2;
+    private Player player1; // Player 1
+    private Player player2; // Player 2
 
-  private Player player1;
-  private Player player2;
+    private JLabel p1Score; // Player 1 Score Label
+    private JLabel p2Score; // Player 2 Score Label
 
-  public App() {
-    this.player1 = new Player("drippy cheese");
-    this.player2 = new Player("american breakfast");
+    public App() {
+        // Initialize players
+        this.player1 = new Player("drippy cheese");
+        this.player2 = new Player("american breakfast");
 
-    ball = new Ball(screenWidth / 2, screenHeight / 2, player1, player2); // Initialize ball at starting position (x, y) and size
-    paddle = new Paddle(paddlePadding, 150, 10, 60, screenHeight - 30);
-    paddle2 = new Paddle((screenWidth - paddlePadding), 150, 10, 60, (screenHeight - 30));
+        // Initialize ball and paddles
+        ball = new Ball(300, 200, player1, player2); // Ball starts at center (default)
+        paddle = new Paddle(paddlePadding, 200 - 30, 10, 60, getHeight()); // Player 1 paddle
+        paddle2 = new Paddle(600 - paddlePadding - 10, 200 - 30, 10, 60, getHeight()); // Player 2 paddle
 
-    setBackground(Color.BLACK); // Set the background color of the panel to black
-    Timer timer = new Timer(1000 / 60, this); // Set up game loop at 60 FPS
-    timer.start();
+        // Panel settings
+        setBackground(Color.BLACK);
+        Timer timer = new Timer(1000 / 60, this); // Game loop runs at 60 FPS
+        timer.start();
 
-    setFocusable(true); // Allow the panel to receive key events
-    addKeyListener(this); // Add key listener for paddle movement
-  }
-
-  // Collision
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    ball.move(getWidth(), getHeight()); // Move ball inside the panel
-    paddle.move(); // Move the paddle based on current speed
-    paddle2.move();
-
-    // Check for collision between the ball and the paddle
-    if (paddle.checkCollision(ball)) {
-      ball.setSpeed(-ball.getXSpeed(), ball.getYSpeed()); // Reverse ball direction on collision
+        setFocusable(true); // Panel can receive keyboard events
+        addKeyListener(this); // Add keyboard controls
     }
 
-    // Check for collision between the ball and the paddle 2
-    if (paddle2.checkCollision(ball)) {
-      ball.setSpeed(-ball.getXSpeed(), ball.getYSpeed()); // Reverse ball direction on collision
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ball.move(getWidth(), getHeight()); // Move the ball dynamically
+        paddle.move(getHeight()); // Use panel height for paddle bounds
+        paddle2.move(getHeight()); // Use panel height for paddle bounds
+
+        // Check for collision between the ball and paddles
+        if (paddle.checkCollision(ball)) {
+            ball.setSpeed(-ball.getXSpeed(), ball.getYSpeed()); // Reverse ball's horizontal direction
+        }
+        if (paddle2.checkCollision(ball)) {
+            ball.setSpeed(-ball.getXSpeed(), ball.getYSpeed()); // Reverse ball's horizontal direction
+        }
+
+        // Update score labels
+        p1Score.setText(player1.getName() + ": " + player1.getPoints());
+        p2Score.setText(player2.getName() + ": " + player2.getPoints());
+
+        repaint(); // Redraw the game screen
     }
 
-    repaint(); // Repaint the panel
-  }
-
-  @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    ball.draw(g); // Draw the ball on the panel
-    paddle.draw(g);
-    paddle2.draw(g);
-  }
-
-  @Override
-  public void keyReleased(KeyEvent e) {
-    int key = e.getKeyCode();
-    if (key == KeyEvent.VK_W || key == KeyEvent.VK_S) {
-      paddle.move();
-      paddle.setYSpeed(0); // Stop paddle when key is released
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ball.draw(g); // Draw the ball
+        paddle.draw(g); // Draw Player 1's paddle
+        paddle2.draw(g); // Draw Player 2's paddle
     }
 
-    if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
-      paddle2.move();
-      paddle2.setYSpeed(0); // Stop paddle when key is released
-    }
-  }
-
-  @Override
-  public void keyTyped(KeyEvent e) {
-  }
-
-  @Override
-  public void keyPressed(KeyEvent e) {
-    int key = e.getKeyCode();
-    if (key == KeyEvent.VK_W) {
-      paddle.setYSpeed(-5); // Move paddle up
-    } else if (key == KeyEvent.VK_S) {
-      paddle.setYSpeed(5); // Move paddle down
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        // Player 1 controls (W/S keys)
+        if (key == KeyEvent.VK_W) {
+            paddle.setYSpeed(-5); // Move paddle up
+        } else if (key == KeyEvent.VK_S) {
+            paddle.setYSpeed(5); // Move paddle down
+        }
+        // Player 2 controls (UP/DOWN arrow keys)
+        if (key == KeyEvent.VK_UP) {
+            paddle2.setYSpeed(-5); // Move paddle up
+        } else if (key == KeyEvent.VK_DOWN) {
+            paddle2.setYSpeed(5); // Move paddle down
+        }
     }
 
-    if (key == KeyEvent.VK_UP) {
-      paddle2.setYSpeed(-5); // Move paddle up
-    } else if (key == KeyEvent.VK_DOWN) {
-      paddle2.setYSpeed(5); // Move paddle down
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        // Stop paddle movement on key release
+        if (key == KeyEvent.VK_W || key == KeyEvent.VK_S) {
+            paddle.setYSpeed(0);
+        }
+        if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
+            paddle2.setYSpeed(0);
+        }
     }
-  }
 
-  public static void main(String[] args) {
-    JFrame frame = new JFrame("Pong Game");
-    App pongGame = new App();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(screenWidth, screenHeight); // Set window size
-    frame.add(pongGame);
-    frame.setVisible(true);
-  }
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // No action needed for keyTyped
+    }
+
+    public static void main(String[] args) {
+        // Create JFrame for the game
+        JFrame frame = new JFrame("Pong Game");
+        App pongGame = new App();
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400); // Set the window size
+        frame.setLayout(new BorderLayout()); // Use BorderLayout for proper positioning
+        frame.add(pongGame, BorderLayout.CENTER); // Add the game panel to the center
+
+        // Create Score Labels
+        pongGame.p1Score = new JLabel(pongGame.player1.getName() + ": " + pongGame.player1.getPoints());
+        pongGame.p2Score = new JLabel(pongGame.player2.getName() + ": " + pongGame.player2.getPoints());
+        pongGame.p1Score.setForeground(Color.WHITE);
+        pongGame.p2Score.setForeground(Color.WHITE);
+        pongGame.p1Score.setHorizontalAlignment(SwingConstants.LEFT);
+        pongGame.p2Score.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        JPanel scorePanel = new JPanel(new BorderLayout());
+        scorePanel.setBackground(Color.BLACK);
+        scorePanel.add(pongGame.p1Score, BorderLayout.WEST);
+        scorePanel.add(pongGame.p2Score, BorderLayout.EAST);
+
+        frame.add(scorePanel, BorderLayout.NORTH); // Add score panel to the top
+
+        // Start the game
+        frame.setVisible(true);
+    }
 }

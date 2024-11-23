@@ -22,4 +22,8 @@ public class Player
   {
     points++;
   }
+  public void resetPoint()
+  {
+    points = 0;
+  }
 }

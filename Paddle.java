@@ -17,16 +17,18 @@ public class Paddle {
     }
 
     // Method to move the paddle based on its current speed
-    public void move() {
+    // Method to move the paddle based on its current speed and panel height
+    public void move(int panelHeight) {
         y += ySpeed;
 
         // Prevent paddle from moving out of bounds
         if (y < 0) {
             y = 0;
-        } else if (y + height > screenHeight) {
-            y = screenHeight - height;
+        } else if (y + height > panelHeight) {
+            y = panelHeight - height;
         }
     }
+
 
     // Draw the paddle on the screen
     public void draw(Graphics g) {
