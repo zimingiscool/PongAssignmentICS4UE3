@@ -19,8 +19,7 @@ public class App extends JPanel implements ActionListener, KeyListener {
     this.player1 = new Player("drippy cheese");
     this.player2 = new Player("american breakfast");
 
-    ball = new Ball(screenWidth / 2, screenHeight / 2, player1, player2); // Initialize ball at starting position (x, y)
-                                                                          // and size
+    ball = new Ball(screenWidth / 2, screenHeight / 2, player1, player2); // Initialize ball at starting position (x, y) and size
     paddle = new Paddle(paddlePadding, 150, 10, 60, screenHeight - 30);
     paddle2 = new Paddle((screenWidth - paddlePadding), 150, 10, 60, (screenHeight - 30));
 
@@ -97,7 +96,6 @@ public class App extends JPanel implements ActionListener, KeyListener {
   public static void main(String[] args) {
     JFrame frame = new JFrame("Pong Game");
     App pongGame = new App();
-    frame.setLayout(null);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(screenWidth, screenHeight); // Set window size
     frame.add(pongGame);
