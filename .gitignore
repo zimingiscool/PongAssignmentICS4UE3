@@ -1,3 +1,5 @@
 App.class
 Draw.class
 Player.class
+Paddle.class
+Ball.class
