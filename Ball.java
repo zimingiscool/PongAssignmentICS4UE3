@@ -1,4 +1,5 @@
 import java.awt.*;
+import javax.swing.JOptionPane;
 
 public class Ball {
     private static int width = 20; // Ball width
@@ -27,11 +28,19 @@ public class Ball {
     if (x <= 0) {
         p2.addPoint(); // Player 2 scores
         resetBall(screenWidth, screenHeight); // Reset ball
+        if(p2.getPoints() == 11){
+            JOptionPane.showMessageDialog(null, "Player: " + p2.getName() + "has won!");
+        }
     }
     // Check for collision with the right wall
     else if (x + width >= screenWidth) {
+        
         p1.addPoint(); // Player 1 scores
         resetBall(screenWidth, screenHeight); // Reset ball
+        if(p1.getPoints() == 11){
+            JOptionPane.showMessageDialog(null, "Player: " + p1.getName() + "has won!");
+        }
+
     }
 
     // Check for collision with the top and bottom walls
